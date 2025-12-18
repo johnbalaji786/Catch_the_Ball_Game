@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Catch the Ball Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .game-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+    canvas {
+      background: #f9f9f9;
+      border-radius: 12px;
+      display: block;
+      margin: 10px auto;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #ff9800;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #fb8c00;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h2>🎯 Catch the Ball</h2>
+    <p>Score: <span id="score">0</span></p>
+    <canvas id="gameCanvas" width="300" height="400"></canvas>
+    <button onclick="startGame()">Start / Restart</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let ballX, ballY, ballRadius = 12;
+    let basketX, basketWidth = 60, basketHeight = 12;
+    let score = 0;
+    let gameInterval;
+
+    function startGame() {
+      score = 0;
+      document.getElementById('score').innerText = score;
+      ballY = 0;
+      ballX = Math.random() * (canvas.width - ballRadius * 2) + ballRadius;
+      basketX = canvas.width / 2 - basketWidth / 2;
+      clearInterval(gameInterval);
+      gameInterval = setInterval(updateGame, 20);
+    }
+
+    function updateGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw ball
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = '#e91e63';
+      ctx.fill();
+
+      // Draw basket
+      ctx.fillStyle = '#3f51b5';
+      ctx.fillRect(basketX, canvas.height - basketHeight - 5, basketWidth, basketHeight);
+
+      ballY += 3;
+
+      // Collision detection
+      if (
+        ballY + ballRadius >= canvas.height - basketHeight - 5 &&
+        ballX > basketX &&
+        ballX < basketX + basketWidth
+      ) {
+        score++;
+        document.getElementById('score').innerText = score;
+        ballY = 0;
+        ballX = Math.random() * (canvas.width - ballRadius * 2) + ballRadius;
+      }
+
+      // Game over
+      if (ballY > canvas.height) {
+        clearInterval(gameInterval);
+        alert('Game Over! Your Score: ' + score);
+      }
+    }
+
+    // Mouse control
+    canvas.addEventListener('mousemove', function (e) {
+      const rect = canvas.getBoundingClientRect();
+      basketX = e.clientX - rect.left - basketWidth / 2;
+    });
+  </script>
+</body>
+</html>
